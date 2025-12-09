@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClassCart</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+  <div id="app" class="app-container">
+    <h1>ClassCart <i class="fa fa-star sparkles"></i></h1>
+
+    <div class="controls">
+      <div class="sort-controls">
+        <label>Sort by:</label>
+        <select v-model="sortBy">
+          <option value="subject">Subject</option>
+          <option value="location">Location</option>
+          <option value="price">Price</option>
+          <option value="spaces">Spaces</option>
+        </select>
+        <label><input type="checkbox" v-model="ascending"> Ascending</label>
+      </div>
+
+      <button class="toggle-cart-btn" @click="toggleCart">
+        <i class="fa fa-shopping-cart"></i>
+        {{ showCart ? 'Back to Lessons' : 'Cart' }}
+        <span v-if="cart.length > 0" class="cart-badge">{{ cart.length }}</span>
+      </button>
+    </div>
+
+    <!-- Lesson Cards -->
+    <div v-if="!showCart" class="lessons">
+      <div class="lesson-card" v-for="lesson in sortedLessons" :key="lesson.id">
+        <img :src="'images/' + lesson.image" alt="Lesson Image" class="lesson-img">
+        <p><strong>{{ lesson.subject }}</strong></p>
+        <p>Location: {{ lesson.location }}</p>
+        <p>Price: £{{ lesson.price }}</p>
+        <p>Spaces: {{ lesson.spaces }}</p>
+        <button @click="addToCart(lesson)" :disabled="lesson.spaces === 0">
+          Add to Cart
+        </button>
+      </div>
+    </div>
+
+    <!-- Cart Page -->
+    <div v-if="showCart" class="cart-page">
+      <h2>Your Cart</h2>
+      <ul class="cart-list" v-if="cart.length > 0">
+        <li v-for="(item, idx) in cart" :key="idx">
+          {{ item.subject }} – £{{ item.price }}
+          <button @click="removeFromCart(idx)">Remove</button>
+        </li>
+      </ul>
+      <p v-else>Your cart is empty.</p>
+
+      <p v-if="cart.length">Total: <strong>£{{ cartTotal }}</strong></p>
+
+      <div class="checkout-form">
+        <input v-model="name" placeholder="Your Name">
+        <input v-model="phone" placeholder="Phone Number">
+        <button :disabled="!canCheckout()" @click="submitOrder">Submit Order</button>
+        <p class="error" v-if="errorMsg">{{ errorMsg }}</p>
+        <p class="success" v-if="successMsg">{{ successMsg }}</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
